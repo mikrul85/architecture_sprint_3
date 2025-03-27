@@ -1,0 +1,80 @@
+@startuml
+
+!include <C4/C4_Container>
+
+title Диаграмма Контейнеров: основные контейнеры и их взаимодействие
+
+Person(user,"Пользователь", "Пользователь системы")
+
+Container(clientApp, "Клиентское приложение", "Mobile/Web", "Интерфейс пользователя")
+Container(apiGateway, "API Gateway", "Nginx", "Маршрутизация и аутентификация")
+
+System_Boundary("SmartHouseSystem", "Микросервисы и базы данных") {
+    Container(kafka, "Kafka", "Apache Kafka", "Шина данных")
+    Container_Boundary(auth, "Авторизация") {
+        Container(authService, "Сервис авторизации", "Java", "Аутентификация и авторизация")
+        ContainerDb(userDb, "БД пользователей", "PostgreSQL", "Данные пользователей")
+    }
+    Container_Boundary(heating, "Управление отоплением") {
+        Container(heatingService, "Сервис управления отоплением", "Java", "Управление отоплением")
+        ContainerDb(heatingDb, "БД отопления", "PostgreSQL", "Настройки отопления")
+    }
+
+    Container_Boundary(telemetry, "Телеметрия") {
+        Container(tempService, "Сервис мониторинга температуры", "Python", "Мониторинг температуры")
+        ContainerDb(telemetryDb, "БД температуры", "InfluxDB", "Телеметрические данные")
+    }
+
+    Container_Boundary(lighting, "Управление освещением") {
+        Container(lightingService, "Сервис управления освещением", "Node.js", "Управление освещением")
+        ContainerDb(lightingDb, "БД освещения", "PostgreSQL", "Настройки освещения")
+    }
+
+    Container_Boundary(access, "Управление доступом") {
+        Container(accessService, "Сервис управления воротами", "Go", "Контроль доступа")
+        ContainerDb(accessDb, "БД ворот", "PostgreSQL", "Данные контроля доступа")
+    }
+
+    Container_Boundary(surveillance, "Управление наблюдением") {
+        Container(surveillanceService, "Сервис управления наблюдением", "C#", "Наблюдение")
+        ContainerDb(surveillanceDb, "БД наблюдения", "PostgreSQL", "Конфигурации камер и записи")
+    }
+
+}
+
+Container_Ext(heatingDevices, "Устройства отопления")
+Container_Ext(tempSensors, "Датчики температуры")
+Container_Ext(lightingDevices, "Устройства освещения")
+Container_Ext(accessDevices, "Ворота")
+Container_Ext(cameras, "Камеры видеонаблюдения")
+
+Rel(user, clientApp, "Использует")
+Rel(clientApp, apiGateway, "Отправляет запросы", "HTTPS")
+
+Rel(apiGateway, authService, "Маршрутизирует для аутентификации", "HTTPS")
+Rel(apiGateway, heatingService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, tempService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, lightingService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, accessService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, surveillanceService, "Маршрутизирует", "HTTPS")
+
+Rel(authService, userDb, "Читает и пишет", "SQL")
+Rel(tempService, telemetryDb, "Читает и пишет", "SQL")
+Rel(heatingService, heatingDb, "Читает и пишет", "SQL")
+Rel(lightingService, lightingDb, "Читает и пишет", "SQL")
+Rel(accessService, accessDb, "Читает и пишет", "SQL")
+Rel(surveillanceService, surveillanceDb, "Читает и пишет", "SQL")
+
+Rel(heatingService, kafka, "Публикует и подписывается на события", "JSON")
+Rel(tempService, kafka, "Публикует данные", "JSON")
+Rel(lightingService, kafka, "Публикует и подписывается на события", "JSON")
+Rel(accessService, kafka, "Публикует и подписывается на события", "JSON")
+Rel(surveillanceService, kafka, "Публикует и подписывается на события", "JSON")
+
+Rel(heatingService, heatingDevices, "Обменивается данными", "HTTP")
+Rel(tempService, tempSensors, "Собирает данные", "HTTP")
+Rel(lightingService, lightingDevices, "Обменивается данными", "HTTP")
+Rel(accessService, accessDevices, "Обменивается данными", "HTTP")
+Rel(surveillanceService, cameras, "Обменивается данными", "RTSP")
+
+@enduml
