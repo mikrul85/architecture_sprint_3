@@ -1,8 +1,8 @@
 @startuml
 
-!include <C4/C4_Container>
+!include <C4/C4_Component>
 
-title Диаграмма контейнеров: основные контейнеры и их взаимодействие
+title Диаграмма компонентов
 
 Person(user,"Пользователь", "Пользователь системы")
 
@@ -12,31 +12,54 @@ Container(apiGateway, "API Gateway", "Nginx", "Маршрутизация и а�
 System_Boundary("SmartHouseSystem", "Микросервисы и базы данных") {
     Container(kafka, "Kafka", "Apache Kafka", "Шина данных")
     Container_Boundary(auth, "Авторизация") {
-        Container(authService, "Сервис авторизации", "Java", "Аутентификация и авторизация")
+        Container(authService, "Сервис авторизации", "Java", "Аутентификация и авторизация") {
+            Component(AuthRepo, "Auth Repository", "Компонент работы с данными")
+            Component(AuthDomain, "Auth Domain", "Бизнес логика")
+        }
         ContainerDb(userDb, "БД пользователей", "PostgreSQL", "Данные пользователей")
     }
     Container_Boundary(heating, "Управление отоплением") {
-        Container(heatingService, "Сервис управления отоплением", "Java", "Управление отоплением")
+        Container(heatingService, "Сервис управления отоплением", "Java", "Управление отоплением") {
+            Component(HeatingRepo, "Heating Repository", "Компонент работы с данными")
+            Component(HeatingDomain, "Heating Domain", "Бизнес логика")
+            Component(HeatingDeviceManager, "Device Manager", "Компонент управления девайсами")
+        }
         ContainerDb(heatingDb, "БД отопления", "PostgreSQL", "Настройки отопления")
     }
 
     Container_Boundary(telemetry, "Телеметрия") {
-        Container(tempService, "Сервис мониторинга температуры", "Python", "Мониторинг температуры")
+        Container(telemetryService, "Сервис мониторинга температуры", "Python", "Мониторинг температуры") {
+            Component(TelemetryRepo, "Telemetry Repository", "Компонент работы с данными")
+            Component(TelemetryDomain, "Telemetry Domain", "Бизнес логика")
+            Component(TelemetryDeviceManager, "Device Manager", "Компонент управления девайсами")
+        }
         ContainerDb(telemetryDb, "БД температуры", "PostgreSQL", "Телеметрические данные")
     }
 
     Container_Boundary(lighting, "Управление освещением") {
-        Container(lightingService, "Сервис управления освещением", "Python", "Управление освещением")
+        Container(lightingService, "Сервис управления освещением", "Python", "Управление освещением") {
+            Component(LightingRepo, "Lighting Repository", "Компонент работы с данными")
+            Component(LightingDomain, "Lighting Domain", "Бизнес логика")
+            Component(LightingDeviceManager, "Device Manager", "Компонент управления девайсами")
+        }
         ContainerDb(lightingDb, "БД освещения", "PostgreSQL", "Настройки освещения")
     }
 
     Container_Boundary(access, "Управление доступом") {
-        Container(accessService, "Сервис управления воротами", "Python", "Контроль доступа")
+        Container(accessService, "Сервис управления воротами", "Python", "Контроль доступа") {
+            Component(AccessRepo, "Access Repository", "Компонент работы с данными")
+            Component(AccessDomain, "Access Domain", "Бизнес логика")
+            Component(AccessDeviceManager, "Device Manager", "Компонент управления девайсами")
+        }
         ContainerDb(accessDb, "БД ворот", "PostgreSQL", "Данные контроля доступа")
     }
 
     Container_Boundary(surveillance, "Управление наблюдением") {
-        Container(surveillanceService, "Сервис управления наблюдением", "Python", "Наблюдение")
+        Container(surveillanceService, "Сервис управления наблюдением", "Python", "Наблюдение") {
+            Component(SurveillanceRepo, "Surveillance Repository", "Компонент работы с данными")
+            Component(SurveillanceDomain, "Surveillance Domain", "Бизнес логика")
+            Component(SurveillanceDeviceManager, "Device Manager", "Компонент управления девайсами")
+        }
         ContainerDb(surveillanceDb, "БД наблюдения", "PostgreSQL", "Конфигурации камер и записи")
     }
 
