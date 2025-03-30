@@ -1,0 +1,49 @@
+@startuml
+
+title Диаграмма кода сервиса управления отоплением
+
+class HeatingSystem {
+ +Long id
+ +boolean isOn
+ +double targetTemperature
+ +double currentTemperature
+}
+
+class TemperatureSensor {
+ +Long id
+ +double currentTemperature
+ +LocalDateTime lastUpdated
+}
+
+class HeatingSystemController {
+  +HeatingSystemService heatingSystemService
+  +Logger logger
+  +HeatingSystem getHeatingSystem()
+  +HeatingSystem updateHeatingSystem()
+  +void turnOn()
+  +void turnOff()
+  +void setTargetTemperature()
+  +Double getCurrentTemperature()
+}
+
+
+class HeatingSystemService {
+  +HeatingSystemRepository heatingSystemRepository
+  +HeatingSystem getHeatingSystem()
+  +HeatingSystem updateHeatingSystem()
+  +void turnOn()
+  +void turnOff()
+  +void setTargetTemperature()
+  +Double getCurrentTemperature()
+}
+
+class HeatingSystemRepository {}
+
+
+HeatingSystemController --> HeatingSystemService
+HeatingSystemService --> HeatingSystemRepository
+HeatingSystemRepository --> TemperatureSensor
+HeatingSystemController --> HeatingSystem
+HeatingSystemService --> HeatingSystem
+
+@enduml
