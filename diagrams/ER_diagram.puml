@@ -1,0 +1,69 @@
+@startuml
+title Диаграмма ER
+
+entity User {
+    * id : UUID
+    --
+    * name: string
+    * email : string
+    * password : string
+}
+
+entity House {
+    * id : UUID
+    --
+    * name: string
+    * user_id: string
+}
+
+entity DeviceType {
+    * id : int
+    --
+    * type: string
+    * name: string
+}
+
+entity Device {
+    * id : UUID
+    --
+    * name: string
+    * type_id: int
+    * house_id : UUID
+    * module_id : UUID 
+    * ip: string
+    * status: int
+    * serial_number: string    
+}
+
+
+entity ModuleType {
+    * id : int
+    --
+    * type: string
+    * name: string
+}
+
+entity Module {
+    * id : UUID
+    --
+    * name: string
+    * type_id: int
+    * house_id : string
+}
+
+entity TelemetryData {
+    * id : UUID
+    --
+    * timestamp : date
+    * device_id : UUID
+    * data: string
+}
+
+User ||..{ House: own
+House ||..o{ Module: contain
+Device ||..|| DeviceType: type of
+Module ||..|| ModuleType: type of
+Module ||..|{ Device: contain
+Device ||..o{ TelemetryData: produce
+
+@enduml
